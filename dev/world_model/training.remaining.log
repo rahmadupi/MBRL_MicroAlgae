@@ -1,0 +1,1009 @@
+Input Notebook:  training.ipynb
+Output Notebook: training.ipynb
+Executing:   0%|          | 0/50 [00:00<?, ?cell/s]Executing notebook with kernel: python3
+Executing Cell 1---------------------------------------
+Ending Cell 1------------------------------------------
+Executing:   2%|▏         | 1/50 [00:00<00:44,  1.09cell/s]Executing Cell 2---------------------------------------
+Ending Cell 2------------------------------------------
+Executing Cell 3---------------------------------------
+World-model modules loaded from: /home/rahmadbisma/Documents/ITS/MBRL_MicroAlgae/dev/world_model
+
+    package  available       version                import_error
+0     torch       True  2.12.0+cu130                         NaN
+1   sklearn       True         1.8.0                         NaN
+2   xgboost       True         3.2.0                         NaN
+3  lightgbm      False           NaN  No module named 'lightgbm'
+4     scipy       True        1.17.1                         NaN
+5    joblib       True         1.5.3                         NaN
+tqdm progress available: True
+
+Ending Cell 3------------------------------------------
+Executing:   6%|▌         | 3/50 [00:05<01:24,  1.80s/cell]Executing Cell 4---------------------------------------
+Ending Cell 4------------------------------------------
+Executing Cell 5---------------------------------------
+Progress backend: text | bars enabled: False
+Training seed: 44 | fixed window-selection seed: 42
+Run: 5S_BT128_SD44_ROUT1_20261109T221542509767Z | requested device: auto | neural device: cuda
+Kernel Python: /usr/bin/python
+PyTorch: 2.12.0+cu130 | compiled CUDA: 13.0
+CUDA available in this kernel: True | visible CUDA devices: 1
+History: 60 minutes / 720 samples
+Prediction step: 5 seconds | target: instantaneous_sample
+pg_ac_tcn | maximum training rollout: 1 steps / 0.08333333333333333 minutes | curriculum: []
+Multi-step training keeps gradients through predicted feedback; checkpoint selection remains one-step validation.
+TCN receptive field: 1021 samples / 85.08333333333333 minutes
+
+              target_order                                         provenance
+0               1_tds(ppm)           TDS sensor proxy; calibration unresolved
+1               1_do(mg/L)  Dissolved-oxygen sensor channel; calibration u...
+2                     1_ph          pH sensor channel; calibration unresolved
+3              1_cod(mg/L)  Sensor COD proxy; independent laboratory valid...
+4              1_toc(mg/L)  TOC sensor proxy; independence and calibration...
+5         1_turbidity(NTU)  Turbidity sensor proxy; not specific to algal ...
+6              1_nh3(mg/L)  Water-ammonia sensor proxy; species/reporting ...
+7            1_temp_air(C)  Water temperature sensor channel; calibration ...
+8             2_light(Lux)  Measured light sensor channel; distinct from l...
+9   biomassa_estimasi(g/L)  Interpolated OD-derived biomass estimate; futu...
+10             1_bod(mg/L)  README: firmware BOD derived from COD; retaine...
+11             1_tss(mg/L)  README: dedicated newer-hardware TSS sensor; m...
+Label mode: proxy_prototype | target transform: mixed
+Neural output width: 24 (12 means + 12 log-variances)
+History channels: 21 | measured TSS history included
+Input history excludes biomass, BOD, estimated OD/wet/dry mass, calculated lamp lux, and MPPT.
+TSS remains a level prediction target even when its history is included; BOD stays independently predicted, not forced to COD/2.
+Biomass is an interpolated estimate; no independent biological/compliance validation is claimed.
+Training track: full_scalable
+Training sampling: {'event_fraction': 0.25, 'start_spacing_seconds': 5, 'spacing_candidates_seconds': [5, 30, 60]}
+Treatment diagnostic cohort: {'windows_per_cultivation': 256, 'post_event_minutes': 15} | excluded from checkpoint selection score
+Usable hardware budgets: 8 GiB RAM / 6 GiB VRAM
+Detected GPU: NVIDIA GeForce RTX 3050 6GB Laptop GPU
+Detected VRAM GiB: 5.72
+Training recipe: treatment_aware_12targets_v3
+Checkpoint zero predicts persistence for the original nine targets and training means for biomass/BOD/TSS; TSS evaluation also reports observed-history persistence when available.
+Ridge/GPR candidates and XGBoost early stopping use K14 only; K16 remains reserved.
+
+Ending Cell 5------------------------------------------
+Executing:  10%|█         | 5/50 [00:05<00:40,  1.10cell/s]Executing Cell 6---------------------------------------
+Continue training: False | source artifacts: none
+Recovery: {'enabled': True, 'every_epochs': 5, 'directory': '/home/rahmadbisma/Documents/ITS/MBRL_MicroAlgae/dev/world_model/model/5S_BT128_SD44_ROUT1_20261109T221542509767Z/recovery', 'resume_by_algorithm': {}}
+Recovery saves at epoch boundaries; an interrupted unfinished epoch is replayed.
+
+Ending Cell 6------------------------------------------
+Executing Cell 7---------------------------------------
+Ending Cell 7------------------------------------------
+Executing Cell 8---------------------------------------
+   cultivation                   file    rows               start  \
+0           11  K11_sensor_5detik.csv  252721 2026-05-06 17:00:00   
+1           12  K12_sensor_5detik.csv  410581 2026-06-15 16:00:00   
+2           13  K13_sensor_5detik.csv  259201 2026-07-24 10:00:00   
+3           14  K14_sensor_5detik.csv  240601 2026-08-28 12:00:00   
+
+                  end  sampling_interval_seconds  observation_operator  \
+0 2026-05-21 08:00:00                          5  instantaneous_sample   
+1 2026-07-09 10:15:00                          5  instantaneous_sample   
+2 2026-08-08 10:00:00                          5  instantaneous_sample   
+3 2026-09-11 10:10:00                          5  instantaneous_sample   
+
+  full_bins  eligible_observation_rows  quality_flags_available  \
+0      None                     252721                    False   
+1      None                     410581                    False   
+2      None                     259201                    False   
+3      None                     240601                    False   
+
+                                              sha256       split  
+0  bf8da50b8b8b6ac6c0ff2f1c072623b7f9f1e207aa8d4e...       train  
+1  f35495986fdda7648a6aac17d21d2a8721db174468ee7d...       train  
+2  6de1b31d4193af3bc515ac25aeda7579e820f938c39c88...       train  
+3  fddf17a1fad27359c19c36646636426cf549ca9edc09c7...  validation  
+K16 is not loaded for fitting or selection.
+
+Ending Cell 8------------------------------------------
+Executing:  16%|█▌        | 8/50 [00:13<01:20,  1.91s/cell]Executing Cell 9---------------------------------------
+Ending Cell 9------------------------------------------
+Executing Cell 10--------------------------------------
+Ending Cell 10-----------------------------------------
+Executing Cell 11--------------------------------------
+<IPython.core.display.Markdown object>
+        split  cultivation    rows  finite_readings  negative_readings  \
+0       train           11  252721           252721                  0   
+1       train           12  410581           410581                  0   
+2       train           13  259201           259201                  0   
+3  validation           14  240601           240601                  0   
+
+                                              source  
+0  Actual CSV TSS; README documents dedicated new...  
+1  Actual CSV TSS; README documents dedicated new...  
+2  Actual CSV TSS; README documents dedicated new...  
+3  Actual CSV TSS; README documents dedicated new...  
+<IPython.core.display.Markdown object>
+    cultivation                  target  spike_candidates  \
+0            11              1_tds(ppm)                 9   
+1            11              1_do(mg/L)                75   
+2            11                    1_ph                 0   
+3            11             1_cod(mg/L)               407   
+4            11             1_toc(mg/L)               416   
+5            11        1_turbidity(NTU)               710   
+6            11             1_nh3(mg/L)                 0   
+7            11           1_temp_air(C)                11   
+8            11            2_light(Lux)                 0   
+9            11  biomassa_estimasi(g/L)                31   
+10           11             1_bod(mg/L)               472   
+11           11             1_tss(mg/L)               710   
+12           12              1_tds(ppm)                10   
+13           12              1_do(mg/L)               470   
+14           12                    1_ph                 0   
+15           12             1_cod(mg/L)              1224   
+16           12             1_toc(mg/L)              1210   
+17           12        1_turbidity(NTU)              1074   
+18           12             1_nh3(mg/L)                 0   
+19           12           1_temp_air(C)                 9   
+20           12            2_light(Lux)                 0   
+21           12  biomassa_estimasi(g/L)                38   
+22           12             1_bod(mg/L)              1024   
+23           12             1_tss(mg/L)              1076   
+24           13              1_tds(ppm)                 6   
+25           13              1_do(mg/L)                 3   
+26           13                    1_ph                 0   
+27           13             1_cod(mg/L)               826   
+28           13             1_toc(mg/L)               803   
+29           13        1_turbidity(NTU)               716   
+30           13             1_nh3(mg/L)                 0   
+31           13           1_temp_air(C)                 4   
+32           13            2_light(Lux)                 0   
+33           13  biomassa_estimasi(g/L)                14   
+34           13             1_bod(mg/L)               728   
+35           13             1_tss(mg/L)               702   
+36           14              1_tds(ppm)                 9   
+37           14              1_do(mg/L)                37   
+38           14                    1_ph                 0   
+39           14             1_cod(mg/L)               827   
+40           14             1_toc(mg/L)               836   
+41           14        1_turbidity(NTU)               585   
+42           14             1_nh3(mg/L)                 0   
+43           14           1_temp_air(C)                 5   
+44           14            2_light(Lux)                 0   
+45           14  biomassa_estimasi(g/L)                 9   
+46           14             1_bod(mg/L)               678   
+47           14             1_tss(mg/L)               576   
+
+    long_flat_run_readings  range_screen_readings  outlier_screen_assessed  \
+0                        0                      0                     True   
+1                      594                      0                     True   
+2                     1495                      0                    False   
+3                        0                      0                     True   
+4                        0                      0                     True   
+5                        0                      0                     True   
+6                     1134                      0                    False   
+7                        0                      0                     True   
+8                     3504                      0                    False   
+9                        0                      0                     True   
+10                       0                      0                     True   
+11                       0                      0                     True   
+12                       0                      0                     True   
+13                    1022                      0                     True   
+14                    2569                      0                    False   
+15                       0                      0                     True   
+16                       0                      0                     True   
+17                       0                      0                     True   
+18                    4297                      0                    False   
+19                       0                      0                     True   
+20                  134942                      0                    False   
+21                       0                      0                     True   
+22                       0                      0                     True   
+23                       0                      0                     True   
+24                       0                      0                     True   
+25                       0                      0                     True   
+26                    1410                      0                    False   
+27                     399                      0                     True   
+28                       0                      0                     True   
+29                       0                      0                     True   
+30                    6376                      0                    False   
+31                       0                      0                     True   
+32                  219851                      0                    False   
+33                       0                      0                     True   
+34                       0                      0                     True   
+35                       0                      0                     True   
+36                       0                      0                     True   
+37                       0                      0                     True   
+38                    1519                      0                    False   
+39                       0                      0                     True   
+40                       0                      0                     True   
+41                       0                      0                     True   
+42                    4132                      0                    False   
+43                       0                      0                     True   
+44                   22873                      0                    False   
+45                       0                      0                     True   
+46                       0                      0                     True   
+47                       0                      0                     True   
+
+    residual_robust_sigma                                         provenance  
+0               15.300918  Sensor CSV proxy; calibration, resolution and ...  
+1                0.014826  Sensor CSV proxy; calibration, resolution and ...  
+2                0.000000  Sensor CSV proxy; calibration, resolution and ...  
+3                2.372127  Sensor CSV proxy; calibration, resolution and ...  
+4                0.741301  Sensor CSV proxy; calibration, resolution and ...  
+5                1.171223  Sensor CSV proxy; calibration, resolution and ...  
+6                0.000000  Sensor CSV proxy; calibration, resolution and ...  
+7                0.074132  Sensor CSV proxy; calibration, resolution and ...  
+8                0.000000  Sensor CSV proxy; calibration, resolution and ...  
+9                0.002224  Interpolated OD-derived estimate; synthetic fl...  
+10               1.186086  Firmware-derived/provisional BOD; not independ...  
+11               1.749550  Sensor CSV proxy; calibration, resolution and ...  
+12              15.774366  Sensor CSV proxy; calibration, resolution and ...  
+13               0.014826  Sensor CSV proxy; calibration, resolution and ...  
+14               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+15               2.668689  Sensor CSV proxy; calibration, resolution and ...  
+16               0.859906  Sensor CSV proxy; calibration, resolution and ...  
+17               1.289857  Sensor CSV proxy; calibration, resolution and ...  
+18               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+19               0.074129  Sensor CSV proxy; calibration, resolution and ...  
+20               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+21               0.002520  Interpolated OD-derived estimate; synthetic fl...  
+22               1.630860  Firmware-derived/provisional BOD; not independ...  
+23               1.927365  Sensor CSV proxy; calibration, resolution and ...  
+24              23.854838  Sensor CSV proxy; calibration, resolution and ...  
+25               0.059304  Sensor CSV proxy; calibration, resolution and ...  
+26               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+27               3.558259  Sensor CSV proxy; calibration, resolution and ...  
+28               1.126770  Sensor CSV proxy; calibration, resolution and ...  
+29               1.186154  Sensor CSV proxy; calibration, resolution and ...  
+30               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+31               0.074132  Sensor CSV proxy; calibration, resolution and ...  
+32               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+33               0.002372  Interpolated OD-derived estimate; synthetic fl...  
+34               1.927365  Firmware-derived/provisional BOD; not independ...  
+35               1.793891  Sensor CSV proxy; calibration, resolution and ...  
+36              18.132196  Sensor CSV proxy; calibration, resolution and ...  
+37               0.029652  Sensor CSV proxy; calibration, resolution and ...  
+38               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+39               2.668689  Sensor CSV proxy; calibration, resolution and ...  
+40               0.845083  Sensor CSV proxy; calibration, resolution and ...  
+41               1.349219  Sensor CSV proxy; calibration, resolution and ...  
+42               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+43               0.074132  Sensor CSV proxy; calibration, resolution and ...  
+44               0.000000  Sensor CSV proxy; calibration, resolution and ...  
+45               0.002669  Interpolated OD-derived estimate; synthetic fl...  
+46               1.482602  Firmware-derived/provisional BOD; not independ...  
+47               2.031158  Sensor CSV proxy; calibration, resolution and ...  
+<IPython.core.display.Markdown object>
+    cultivation              treatment  eligible_event_starts  \
+0            11      Pump1_NaHCO3 (mL)                    163   
+1            11      Pump2_Molase (mL)                    163   
+2            11  Pump3_Microalgae (mL)                     51   
+3            11       Aerator_RU (L/s)                      6   
+4            11           Lampu (PWM%)                      6   
+5            12      Pump1_NaHCO3 (mL)                     41   
+6            12      Pump2_Molase (mL)                    157   
+7            12  Pump3_Microalgae (mL)                     17   
+8            12       Aerator_RU (L/s)                     44   
+9            12           Lampu (PWM%)                     13   
+10           13      Pump1_NaHCO3 (mL)                     21   
+11           13      Pump2_Molase (mL)                     11   
+12           13  Pump3_Microalgae (mL)                    149   
+13           13       Aerator_RU (L/s)                     16   
+14           13           Lampu (PWM%)                     38   
+
+    selected_event_starts      event_definition availability  
+0                     163  positive logged dose    available  
+1                     163  positive logged dose    available  
+2                      51  positive logged dose    available  
+3                       6       setting changed    available  
+4                       6       setting changed    available  
+5                      41  positive logged dose    available  
+6                     157  positive logged dose    available  
+7                      17  positive logged dose    available  
+8                      44       setting changed    available  
+9                      13       setting changed    available  
+10                     21  positive logged dose    available  
+11                     11  positive logged dose    available  
+12                    149  positive logged dose    available  
+13                     16       setting changed    available  
+14                     38       setting changed    available  
+<IPython.core.display.Markdown object>
+   cultivation                    cohort  eligible_starts  eligible_dates  \
+0           14  separate_treatment_audit            46476              12   
+
+   eligible_hour_bins  eligible_pump_active_starts  eligible_day_starts  \
+0                 256                          257                23477   
+
+   eligible_night_starts  selected_starts  selected_dates  selected_hour_bins  \
+0                  22999              256              12                 190   
+
+   selected_pump_active_starts  selected_day_starts  selected_night_starts  \
+0                          123                  126                    130   
+
+                                       coverage_note  
+0  Clock day/night proxy; logged dose rows are no...  
+<IPython.core.display.Markdown object>
+   cultivation  start_spacing_seconds  all_eligible_starts  \
+0           11                      5               252001   
+1           11                     30               252001   
+2           11                     60               252001   
+3           12                      5               409861   
+4           12                     30               409861   
+5           12                     60               409861   
+6           13                      5               258481   
+7           13                     30               258481   
+8           13                     60               258481   
+
+   uncapped_starts_with_events_preserved  logged_treatment_starts_preserved  
+0                                 252001                                277  
+1                                  42177                                277  
+2                                  21274                                277  
+3                                 409861                                214  
+4                                  68520                                214  
+5                                  34369                                214  
+6                                 258481                                215  
+7                                  43294                                215  
+8                                  21755                                215  
+<IPython.core.display.Markdown object>
+   cultivation            source       target  finite_pairs  correlation  \
+0           11  1_turbidity(NTU)  1_tss(mg/L)        252721     1.000000   
+1           11       1_cod(mg/L)  1_toc(mg/L)        252721     0.999986   
+2           11       1_cod(mg/L)  1_bod(mg/L)        252721     0.997094   
+3           12  1_turbidity(NTU)  1_tss(mg/L)        410581     1.000000   
+4           12       1_cod(mg/L)  1_toc(mg/L)        410581     0.999986   
+5           12       1_cod(mg/L)  1_bod(mg/L)        410581     0.999187   
+6           13  1_turbidity(NTU)  1_tss(mg/L)        259201     1.000000   
+7           13       1_cod(mg/L)  1_toc(mg/L)        259201     0.999985   
+8           13       1_cod(mg/L)  1_bod(mg/L)        259201     0.999097   
+
+   affine_slope  affine_intercept  residual_std_fraction  \
+0      1.500000          0.000075               0.000018   
+1      0.317501         -0.001885               0.005359   
+2      0.499163          5.475514               0.076176   
+3      1.500000          0.000063               0.000023   
+4      0.317432          0.011115               0.005210   
+5      0.500242          0.327520               0.040308   
+6      1.500000          0.000043               0.000029   
+7      0.317500         -0.036967               0.005526   
+8      0.499518          0.336171               0.042480   
+
+                                      interpretation  
+0  Descriptive dependence; does not prove indepen...  
+1  Descriptive dependence; does not prove indepen...  
+2  Descriptive dependence; does not prove indepen...  
+3  Descriptive dependence; does not prove indepen...  
+4  Descriptive dependence; does not prove indepen...  
+5  Descriptive dependence; does not prove indepen...  
+6  Descriptive dependence; does not prove indepen...  
+7  Descriptive dependence; does not prove indepen...  
+8  Descriptive dependence; does not prove indepen...  
+<IPython.core.display.Markdown object>
+    cultivation         group  readings  light_mean_lux  light_std_lux  \
+0            11           all    252721     1361.897749     203.538415   
+1            11     clock_day    123121     1363.300465     191.731602   
+2            11   clock_night    129600     1360.565158     214.144373   
+3            11  lamp_changed         6     1055.921673     738.713523   
+4            11   lamp_steady    252715     1361.905013     203.503541   
+5            12           all    410581      701.338152     480.785501   
+6            12     clock_day    203221      704.400554     478.876633   
+7            12   clock_night    207360      698.336876     482.630089   
+8            12  lamp_changed        13      123.709230     109.417104   
+9            12   lamp_steady    410568      701.356441     480.781732   
+10           13           all    259201      104.650828     280.431742   
+11           13     clock_day    129601      107.653340     278.200135   
+12           13   clock_night    129600      101.648292     282.613849   
+13           13  lamp_changed        38       50.654735     173.467766   
+14           13   lamp_steady    259163      104.658745     280.443672   
+
+    adjacent_change_std_lux  lag1_correlation  logged_lamp_changes  
+0                119.261020          0.828338                    6  
+1                118.987601          0.807402                    0  
+2                119.520189          0.844264                    6  
+3                531.424056          0.744645                    6  
+4                119.227470          0.828364                    0  
+5                  6.142780          0.999918                   13  
+6                  5.737442          0.999928                   10  
+7                  6.515598          0.999909                    3  
+8                  0.004616          1.000000                   13  
+9                  6.142877          0.999918                    0  
+10                 1.564973          0.999984                   38  
+11                 1.520482          0.999985                   22  
+12                 1.608201          0.999984                   16  
+13                 1.028071          0.999982                   38  
+14                 1.565038          0.999984                    0  
+<IPython.core.display.Image object>
+Reference: Persistence for targets in input history; training mean for output-only targets
+
+   cultivation  eligible_windows  selected_windows  eligible_starts  \
+0           11            252001            252001           252001   
+1           12            409861            409861           409861   
+2           13            258481            258481           258481   
+
+   eligible_dates  eligible_hour_bins  eligible_pump_active_starts  \
+0              16                 351                          271   
+1              25                 570                          160   
+2              16                 360                          175   
+
+   eligible_day_starts  eligible_night_starts  selected_starts  \
+0               122401                 129600           252001   
+1               202501                 207360           409861   
+2               128881                 129600           258481   
+
+   selected_dates  selected_hour_bins  selected_pump_active_starts  \
+0              16                 351                          271   
+1              25                 570                          160   
+2              16                 360                          175   
+
+   selected_day_starts  selected_night_starts  \
+0               122401                 129600   
+1               202501                 207360   
+2               128881                 129600   
+
+                                       coverage_note  
+0  Clock day/night proxy; logged dose rows are no...  
+1  Clock day/night proxy; logged dose rows are no...  
+2  Clock day/night proxy; logged dose rows are no...  
+   cultivation  eligible_windows  selected_windows  eligible_starts  \
+0           14            239881               512           239881   
+
+   eligible_dates  eligible_hour_bins  eligible_pump_active_starts  \
+0              15                 334                          257   
+
+   eligible_day_starts  eligible_night_starts  selected_starts  \
+0               118921                 120960              512   
+
+   selected_dates  selected_hour_bins  selected_pump_active_starts  \
+0              15                 324                            0   
+
+   selected_day_starts  selected_night_starts  \
+0                  255                    257   
+
+                                       coverage_note  
+0  Clock day/night proxy; logged dose rows are no...  
+Training windows: 920343
+pg_ac_tcn | complete training-rollout starts: 920343 / 920343 | excluded: 0
+Source feature arrays MiB: 73.9
+Neural batches per selected-cohort epoch: 7191
+Dense GPR kernel matrix alone, GiB: 6310.87
+No expanded training history tensor is allocated.
+Classical memory policy: Classical working-array estimate 207.47 GiB exceeds 3.00 GiB. Choose capped_all_models or reduce history/data explicitly.
+For an eight-family five-second comparison, use capped_all_models; no algorithm receives a hidden smaller sample.
+
+Ending Cell 11-----------------------------------------
+Executing:  22%|██▏       | 11/50 [00:31<02:21,  3.62s/cell]Executing Cell 12--------------------------------------
+Ending Cell 12-----------------------------------------
+Executing Cell 13--------------------------------------
+Ending Cell 13-----------------------------------------
+Executing Cell 14--------------------------------------
+Ending Cell 14-----------------------------------------
+Executing Cell 15--------------------------------------
+Ending Cell 15-----------------------------------------
+Executing Cell 16--------------------------------------
+gru: not selected; skipping.
+
+Ending Cell 16-----------------------------------------
+Executing Cell 17--------------------------------------
+Ending Cell 17-----------------------------------------
+Executing:  34%|███▍      | 17/50 [00:31<00:53,  1.64s/cell]Executing Cell 18--------------------------------------
+lstm: not selected; skipping.
+
+Ending Cell 18-----------------------------------------
+Executing Cell 19--------------------------------------
+Ending Cell 19-----------------------------------------
+Executing Cell 20--------------------------------------
+tcn: not selected; skipping.
+
+Ending Cell 20-----------------------------------------
+Executing Cell 21--------------------------------------
+Ending Cell 21-----------------------------------------
+Executing Cell 22--------------------------------------
+Model: pg_ac_tcn | configured execution device: cuda | hardware: NVIDIA GeForce RTX 3050 6GB Laptop GPU
+Selected: True | PyTorch neural training. | fitting remains subject to dependency and memory checks.
+
+{'epochs': 100,
+ 'patience': 10,
+ 'min_delta': 1e-06,
+ 'batch_size': 128,
+ 'rollout_steps': 1,
+ 'rollout_curriculum': [],
+ 'rollout_discount': 1.0,
+ 'rollout_checkpointing': False,
+ 'learning_rate': 0.0001,
+ 'optimizer': 'adamw',
+ 'weight_decay': 0.0001,
+ 'head_dropout': 0.1,
+ 'gradient_clip_norm': 1.0,
+ 'loss': 'normalized_mse_plus_nll',
+ 'nll_weight': 0.01,
+ 'initialization': 'reference',
+ 'include_initial_checkpoint': True,
+ 'lr_scheduler': True,
+ 'scheduler_factor': 0.5,
+ 'scheduler_patience': 3,
+ 'min_learning_rate': 1e-06,
+ 'hidden_size': 24,
+ 'members': 1,
+ 'head_layout': 'dedicated',
+ 'latest_sensor_to_head': True,
+ 'physics_loss_weight': 0.0,
+ 'physics_bounds': {},
+ 'dilations': [1, 2, 4, 8, 16, 32, 64, 128],
+ 'execution_device': 'cuda',
+ 'device_name': 'NVIDIA GeForce RTX 3050 6GB Laptop GPU'}
+{'algorithm': 'pg_ac_tcn',
+ 'history_minutes': 60,
+ 'history_steps': 720,
+ 'sampling_interval_seconds': 5,
+ 'hidden_size': 24,
+ 'dilations': [1, 2, 4, 8, 16, 32, 64, 128],
+ 'head_dropout': 0.1,
+ 'head_layout': 'dedicated',
+ 'head_groups': {'shared': [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  'bod': [10],
+  'biomass': [9],
+  'tss': [11]},
+ 'attention_heads': 4,
+ 'latent_size': 16,
+ 'sensor_channels': 16,
+ 'action_channels': 5,
+ 'moving_average_kernel': 25,
+ 'pool_scales': [1, 4, 16],
+ 'latest_sensor_to_head': False,
+ 'latest_sensor_names': [],
+ 'latest_sensor_indices': [],
+ 'input_channels': 21,
+ 'outputs': 12,
+ 'target_order': ['1_tds(ppm)',
+  '1_do(mg/L)',
+  '1_ph',
+  '1_cod(mg/L)',
+  '1_toc(mg/L)',
+  '1_turbidity(NTU)',
+  '1_nh3(mg/L)',
+  '1_temp_air(C)',
+  '2_light(Lux)',
+  'biomassa_estimasi(g/L)',
+  '1_bod(mg/L)',
+  '1_tss(mg/L)'],
+ 'log_variance_bounds': [-8, 2]}
+pg_ac_tcn: rollout maximum 1 step(s) / 5 seconds; 920,343/920,343 selected starts eligible; 0 excluded.
+
+pg_ac_tcn: full-state recovery file: /home/rahmadbisma/Documents/ITS/MBRL_MicroAlgae/dev/world_model/model/5S_BT128_SD44_ROUT1_20261109T221542509767Z/recovery/wm_12targets_proxy_pg_ac_tcn_5S_BT128_SD44_ROUT1_20261109T221542509767Z.recovery.pt
+
+pg_ac_tcn member 1 | Starting epoch 1/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: pending (first epoch at this rollout length)
+
+Executing:  42%|████▏     | 21/50 [00:50<00:47,  1.64s/cell]pg_ac_tcn member 1 | Starting epoch 2/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.9 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 3/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.9 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 4/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.6 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 5/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.8 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 6/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~7.0 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 7/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~7.0 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 8/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.4 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 9/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.7 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1 | Starting epoch 10/100 | rollout: 1 step(s) | learning rate: 0.0001 | estimated epoch time: ~6.2 min (previous epoch; includes validation/checkpoint)
+
+pg_ac_tcn member 1: ran 10 epochs; selected epoch 0; 920,343 examples in final epoch.
+Selected the initialization checkpoint: training did not improve validation; no learned improvement is claimed.
+
+pg_ac_tcn | actual fit device: cuda
+pg_ac_tcn member 1 | Best epoch: 0 | validation macro NRMSE: 0.271888 | epochs run: 10 (initialization; training did not improve validation)
+Training rollout: {'steps': 1, 'curriculum': [], 'discount': 1.0, 'activation_checkpointing': False, 'horizon_seconds': 5, 'selected_pool_windows': 920343, 'eligible_windows': 920343, 'excluded_windows': 0, 'excluded_pool_positions': [], 'feedback': 'predicted means; full gradient through all steps; no teacher forcing', 'context': 'persist unpredicted channels; replay logged actions and deterministic clock', 'loss_aggregation': 'normalized discounted mean across all active rollout steps', 'checkpoint_metric': 'one-step validation macro NRMSE'}
+Peak CUDA allocated GiB: 0.39328718185424805
+
+                    target         MAE        RMSE     NRMSE baseline_method  \
+0               1_tds(ppm)    7.461746    9.475212  0.006512     persistence   
+1               1_do(mg/L)    0.013633    0.017611  0.004901     persistence   
+2                     1_ph    0.002480    0.004980  0.012961     persistence   
+3              1_cod(mg/L)    2.276950    3.939340  0.003473     persistence   
+4              1_toc(mg/L)    0.724161    1.251085  0.003474     persistence   
+5         1_turbidity(NTU)    1.310042    1.645255  0.009970     persistence   
+6              1_nh3(mg/L)    0.008789    0.029646  0.003546     persistence   
+7            1_temp_air(C)    0.031289    0.039504  0.024831     persistence   
+8             2_light(Lux)    1.199336    2.111484  0.003540     persistence   
+9   biomassa_estimasi(g/L)    0.251434    0.336522  1.105022   training_mean   
+10             1_bod(mg/L)  446.199136  560.282351  0.987893   training_mean   
+11             1_tss(mg/L)  203.822463  271.416669  1.096532     persistence   
+
+    baseline_RMSE  baseline_skill prediction_status  
+0        9.475211   -3.969018e-08             valid  
+1        0.017611   -1.010693e-08             valid  
+2        0.004980   -6.227528e-08             valid  
+3        3.939340    5.215878e-09             valid  
+4        1.251085    4.540580e-08             valid  
+5        1.645255    1.636719e-08             valid  
+6        0.029646    2.642446e-08             valid  
+7        0.039504   -2.468835e-08             valid  
+8        2.111484    8.582209e-08             valid  
+9        0.336522    3.844687e-08             valid  
+10     560.282349   -4.306940e-09             valid  
+11       2.467913   -1.089782e+02             valid  
+<IPython.core.display.Markdown object>
+         target         MAE        RMSE     NRMSE  baseline_RMSE  \
+1    1_do(mg/L)    0.013633    0.017611  0.004901       0.017611   
+2          1_ph    0.002480    0.004980  0.012961       0.004980   
+3   1_cod(mg/L)    2.276950    3.939340  0.003473       3.939340   
+6   1_nh3(mg/L)    0.008789    0.029646  0.003546       0.029646   
+10  1_bod(mg/L)  446.199136  560.282351  0.987893     560.282349   
+
+    baseline_skill baseline_method  persistence_RMSE  persistence_skill  \
+1    -1.010693e-08     persistence          0.017611      -1.010693e-08   
+2    -6.227528e-08     persistence          0.004980      -6.227528e-08   
+3     5.215878e-09     persistence          3.939340       5.215878e-09   
+6     2.642446e-08     persistence          0.029646       2.642446e-08   
+10   -4.306940e-09   training_mean               NaN                NaN   
+
+   prediction_status normalization_status  
+1              valid            available  
+2              valid            available  
+3              valid            available  
+6              valid            available  
+10             valid            available  
+Priority summary: {'priority_macro_NRMSE': 0.20255465557724367, 'priority_targets_present': 5, 'priority_complete_valid': True}
+
+<IPython.core.display.Markdown object>
+                    target         MAE        RMSE     NRMSE  baseline_RMSE  \
+0               1_tds(ppm)    6.566214    8.394736  0.005769       8.394736   
+1               1_do(mg/L)    0.015039    0.018885  0.005255       0.018885   
+2                     1_ph    0.002070    0.004550  0.011841       0.004550   
+3              1_cod(mg/L)    1.381643    2.288605  0.002018       2.288605   
+4              1_toc(mg/L)    0.442851    0.733338  0.002036       0.733338   
+5         1_turbidity(NTU)    1.308712    1.603595  0.009718       1.603595   
+6              1_nh3(mg/L)    0.010547    0.032476  0.003884       0.032476   
+7            1_temp_air(C)    0.032891    0.041222  0.025911       0.041222   
+8             2_light(Lux)    3.066720    9.823018  0.016470       9.823018   
+9   biomassa_estimasi(g/L)    0.267321    0.351527  1.154294       0.351527   
+10             1_bod(mg/L)  302.681117  333.817399  0.588589     333.817383   
+11             1_tss(mg/L)  216.999848  284.466746  1.149255       2.405268   
+
+    baseline_skill baseline_method  persistence_RMSE  persistence_skill  \
+0    -4.808987e-09     persistence          8.394736      -4.808987e-09   
+1     1.270023e-08     persistence          0.018885       1.270023e-08   
+2    -1.126266e-09     persistence          0.004550      -1.126266e-09   
+3     8.582079e-11     persistence          2.288605       8.582079e-11   
+4     5.166618e-08     persistence          0.733338       5.166618e-08   
+5     7.351901e-08     persistence          1.603595       7.351901e-08   
+6     1.419481e-09     persistence          0.032476       1.419481e-09   
+7    -1.849515e-08     persistence          0.041222      -1.849515e-08   
+8     3.433136e-09     persistence          9.823018       3.433136e-09   
+9     9.466857e-08   training_mean               NaN                NaN   
+10   -4.837859e-08   training_mean               NaN                NaN   
+11   -1.172682e+02     persistence          2.405268      -1.172682e+02   
+
+   prediction_status normalization_status  
+0              valid            available  
+1              valid            available  
+2              valid            available  
+3              valid            available  
+4              valid            available  
+5              valid            available  
+6              valid            available  
+7              valid            available  
+8              valid            available  
+9              valid            available  
+10             valid            available  
+11             valid            available  
+{'validation_treatment_macro_NRMSE': 0.24791997787268513, 'validation_treatment_priority_macro_NRMSE': 0.12231730090328086, 'validation_treatment_starts': 256}
+
+<IPython.core.display.Markdown object>
+                 cohort                  target  rollout_step  \
+0   one_step_checkpoint              1_tds(ppm)             1   
+1   one_step_checkpoint              1_do(mg/L)             1   
+2   one_step_checkpoint                    1_ph             1   
+3   one_step_checkpoint             1_cod(mg/L)             1   
+4   one_step_checkpoint             1_toc(mg/L)             1   
+5   one_step_checkpoint        1_turbidity(NTU)             1   
+6   one_step_checkpoint             1_nh3(mg/L)             1   
+7   one_step_checkpoint           1_temp_air(C)             1   
+8   one_step_checkpoint            2_light(Lux)             1   
+9   one_step_checkpoint  biomassa_estimasi(g/L)             1   
+10  one_step_checkpoint             1_bod(mg/L)             1   
+11  one_step_checkpoint             1_tss(mg/L)             1   
+
+    horizon_seconds  predictions  nonfinite  negative  ph_outside_0_14  \
+0                 5          512          0         0                0   
+1                 5          512          0         0                0   
+2                 5          512          0         0                0   
+3                 5          512          0         0                0   
+4                 5          512          0         0                0   
+5                 5          512          0         0                0   
+6                 5          512          0         0                0   
+7                 5          512          0         0                0   
+8                 5          512          0         0                0   
+9                 5          512          0         0                0   
+10                5          512          0         0                0   
+11                5          512          0         0                0   
+
+    minimum_prediction  maximum_negative_magnitude  mean_negative_magnitude  
+0         6.055010e+03                         0.0                      0.0  
+1         4.410000e+00                         0.0                      0.0  
+2         8.210000e+00                         0.0                      0.0  
+3         1.003000e+02                         0.0                      0.0  
+4         3.164000e+01                         0.0                      0.0  
+5         6.425400e+02                         0.0                      0.0  
+6         3.530000e+01                         0.0                      0.0  
+7         2.511000e+01                         0.0                      0.0  
+8         1.599224e-11                         0.0                      0.0  
+9         1.240126e+00                         0.0                      0.0  
+10        4.752940e+02                         0.0                      0.0  
+11        1.269215e+03                         0.0                      0.0  
+                   cohort                  target  negative  nonfinite  \
+0            Lampu (PWM%)             1_bod(mg/L)         0          0   
+1            Lampu (PWM%)             1_cod(mg/L)         0          0   
+2            Lampu (PWM%)              1_do(mg/L)         0          0   
+3            Lampu (PWM%)             1_nh3(mg/L)         0          0   
+4            Lampu (PWM%)                    1_ph         0          0   
+5            Lampu (PWM%)              1_tds(ppm)         0          0   
+6            Lampu (PWM%)           1_temp_air(C)         0          0   
+7            Lampu (PWM%)             1_toc(mg/L)         0          0   
+8            Lampu (PWM%)             1_tss(mg/L)         0          0   
+9            Lampu (PWM%)        1_turbidity(NTU)         0          0   
+10           Lampu (PWM%)            2_light(Lux)         0          0   
+11           Lampu (PWM%)  biomassa_estimasi(g/L)         0          0   
+12      Pump1_NaHCO3 (mL)             1_bod(mg/L)         0          0   
+13      Pump1_NaHCO3 (mL)             1_cod(mg/L)         0          0   
+14      Pump1_NaHCO3 (mL)              1_do(mg/L)         0          0   
+15      Pump1_NaHCO3 (mL)             1_nh3(mg/L)         0          0   
+16      Pump1_NaHCO3 (mL)                    1_ph         0          0   
+17      Pump1_NaHCO3 (mL)              1_tds(ppm)         0          0   
+18      Pump1_NaHCO3 (mL)           1_temp_air(C)         0          0   
+19      Pump1_NaHCO3 (mL)             1_toc(mg/L)         0          0   
+20      Pump1_NaHCO3 (mL)             1_tss(mg/L)         0          0   
+21      Pump1_NaHCO3 (mL)        1_turbidity(NTU)         0          0   
+22      Pump1_NaHCO3 (mL)            2_light(Lux)         0          0   
+23      Pump1_NaHCO3 (mL)  biomassa_estimasi(g/L)         0          0   
+24      Pump2_Molase (mL)             1_bod(mg/L)         0          0   
+25      Pump2_Molase (mL)             1_cod(mg/L)         0          0   
+26      Pump2_Molase (mL)              1_do(mg/L)         0          0   
+27      Pump2_Molase (mL)             1_nh3(mg/L)         0          0   
+28      Pump2_Molase (mL)                    1_ph         0          0   
+29      Pump2_Molase (mL)              1_tds(ppm)         0          0   
+30      Pump2_Molase (mL)           1_temp_air(C)         0          0   
+31      Pump2_Molase (mL)             1_toc(mg/L)         0          0   
+32      Pump2_Molase (mL)             1_tss(mg/L)         0          0   
+33      Pump2_Molase (mL)        1_turbidity(NTU)         0          0   
+34      Pump2_Molase (mL)            2_light(Lux)         0          0   
+35      Pump2_Molase (mL)  biomassa_estimasi(g/L)         0          0   
+36  Pump3_Microalgae (mL)             1_bod(mg/L)         0          0   
+37  Pump3_Microalgae (mL)             1_cod(mg/L)         0          0   
+38  Pump3_Microalgae (mL)              1_do(mg/L)         0          0   
+39  Pump3_Microalgae (mL)             1_nh3(mg/L)         0          0   
+40  Pump3_Microalgae (mL)                    1_ph         0          0   
+41  Pump3_Microalgae (mL)              1_tds(ppm)         0          0   
+42  Pump3_Microalgae (mL)           1_temp_air(C)         0          0   
+43  Pump3_Microalgae (mL)             1_toc(mg/L)         0          0   
+44  Pump3_Microalgae (mL)             1_tss(mg/L)         0          0   
+45  Pump3_Microalgae (mL)        1_turbidity(NTU)         0          0   
+46  Pump3_Microalgae (mL)            2_light(Lux)         0          0   
+47  Pump3_Microalgae (mL)  biomassa_estimasi(g/L)         0          0   
+48               no_event             1_bod(mg/L)         0          0   
+49               no_event             1_cod(mg/L)         0          0   
+50               no_event              1_do(mg/L)         0          0   
+51               no_event             1_nh3(mg/L)         0          0   
+52               no_event                    1_ph         0          0   
+53               no_event              1_tds(ppm)         0          0   
+54               no_event           1_temp_air(C)         0          0   
+55               no_event             1_toc(mg/L)         0          0   
+56               no_event             1_tss(mg/L)         0          0   
+57               no_event        1_turbidity(NTU)         0          0   
+58               no_event            2_light(Lux)         0          0   
+59               no_event  biomassa_estimasi(g/L)         0          0   
+
+    ph_outside_0_14  minimum_prediction  maximum_negative_magnitude  
+0                 0          475.293958                         0.0  
+1                 0          130.100006                         0.0  
+2                 0            4.760000                         0.0  
+3                 0           45.200001                         0.0  
+4                 0            8.270000                         0.0  
+5                 0         6125.609863                         0.0  
+6                 0           25.559999                         0.0  
+7                 0           41.099998                         0.0  
+8                 0         1269.215022                         0.0  
+9                 0          653.289978                         0.0  
+10                0          862.289978                         0.0  
+11                0            1.240126                         0.0  
+12                0          475.293958                         0.0  
+13                0          187.100006                         0.0  
+14                0            5.040000                         0.0  
+15                0           48.000000                         0.0  
+16                0            8.530000                         0.0  
+17                0         6188.589844                         0.0  
+18                0           27.940001                         0.0  
+19                0           59.639999                         0.0  
+20                0         1269.215022                         0.0  
+21                0          814.400024                         0.0  
+22                0          976.969971                         0.0  
+23                0            1.240126                         0.0  
+24                0          475.293958                         0.0  
+25                0          263.299988                         0.0  
+26                0            5.870000                         0.0  
+27                0           50.200001                         0.0  
+28                0            9.120000                         0.0  
+29                0         6272.810059                         0.0  
+30                0           26.370001                         0.0  
+31                0           83.830002                         0.0  
+32                0         1269.215022                         0.0  
+33                0          999.460022                         0.0  
+34                0          858.109985                         0.0  
+35                0            1.240126                         0.0  
+36                0          475.293958                         0.0  
+37                0         1424.599976                         0.0  
+38                0            4.800000                         0.0  
+39                0           45.000000                         0.0  
+40                0            8.280000                         0.0  
+41                0         6226.479980                         0.0  
+42                0           25.209999                         0.0  
+43                0          454.609985                         0.0  
+44                0         1269.215022                         0.0  
+45                0          682.780029                         0.0  
+46                0          989.619995                         0.0  
+47                0            1.240126                         0.0  
+48                0          475.293958                         0.0  
+49                0          108.400002                         0.0  
+50                0            4.860000                         0.0  
+51                0           51.500000                         0.0  
+52                0            8.730000                         0.0  
+53                0         6390.370117                         0.0  
+54                0           25.940001                         0.0  
+55                0           34.340000                         0.0  
+56                0         1269.215022                         0.0  
+57                0          801.750000                         0.0  
+58                0          995.739990                         0.0  
+59                0            1.240126                         0.0  
+<IPython.core.display.Markdown object>
+   cultivation                  group  eligible_origins  selected_origins  \
+0           14      Pump1_NaHCO3 (mL)               256                 2   
+1           14      Pump2_Molase (mL)                64                 2   
+2           14  Pump3_Microalgae (mL)                20                 2   
+3           14       Aerator_RU (L/s)                 0                 0   
+4           14           Lampu (PWM%)                 5                 2   
+5           14               no_event            193482                 4   
+
+                                      status  \
+0                                  available   
+1                                  available   
+2                                  available   
+3  unavailable; no complete eligible segment   
+4                                  available   
+5                                  available   
+
+                                          definition  
+0      logged dose/change at first predicted reading  
+1      logged dose/change at first predicted reading  
+2      logged dose/change at first predicted reading  
+3      logged dose/change at first predicted reading  
+4      logged dose/change at first predicted reading  
+5  no positive dose or aeration/lamp change durin...  
+<IPython.core.display.Markdown object>
+            group                  target  horizon_minutes  origins  \
+0    Lampu (PWM%)             1_bod(mg/L)              1.0        2   
+1    Lampu (PWM%)             1_bod(mg/L)              5.0        2   
+2    Lampu (PWM%)             1_bod(mg/L)             15.0        2   
+3    Lampu (PWM%)             1_cod(mg/L)              1.0        2   
+4    Lampu (PWM%)             1_cod(mg/L)              5.0        2   
+..            ...                     ...              ...      ...   
+175      no_event            2_light(Lux)              5.0        4   
+176      no_event            2_light(Lux)             15.0        4   
+177      no_event  biomassa_estimasi(g/L)              1.0        4   
+178      no_event  biomassa_estimasi(g/L)              5.0        4   
+179      no_event  biomassa_estimasi(g/L)             15.0        4   
+
+     trajectory_RMSE  persistence_RMSE direction_agreement  actual_amplitude  \
+0         473.450798         11.733079                 0.5         20.749989   
+1         475.042245         12.060948                 0.5         23.849991   
+2         474.264952         14.386820                 0.5         30.800003   
+3          10.337173         10.337173                 0.5         17.349983   
+4          17.091970         17.091970                 0.0         31.799965   
+..               ...               ...                 ...               ...   
+175         1.527302          1.527302                 0.5          4.432510   
+176         1.729561          1.729561                 0.5          4.692520   
+177         0.259646          0.007847                 0.5          0.010500   
+178         0.256562          0.012007                 0.5          0.021200   
+179         0.254276          0.013908                 0.5          0.026550   
+
+     predicted_amplitude  actual_delay_seconds  predicted_delay_seconds  
+0           4.828500e+02                  7.50                      5.0  
+1           4.828500e+02                 15.00                      5.0  
+2           4.828500e+02                 15.00                      5.0  
+3           5.611867e-11                 12.50                      NaN  
+4           5.611867e-11                 15.00                      NaN  
+..                   ...                   ...                      ...  
+175         1.591616e-11                  8.75                      NaN  
+176         1.591616e-11                  8.75                      NaN  
+177         2.587119e-01                  8.75                      5.0  
+178         2.587119e-01                 12.50                      5.0  
+179         2.587119e-01                 13.75                      5.0  
+
+[180 rows x 11 columns]
+Validation macro NRMSE: 0.2718879018260234 | fit seconds: 4008.86
+
+Saved: wm_12targets_proxy_pg_ac_tcn_5S_BT128_SD44_ROUT1_20261109T221542509767Z.json
+
+Ending Cell 22-----------------------------------------
+Executing:  44%|████▍     | 22/50 [1:07:26<2:28:45, 318.77s/cell]Executing Cell 23--------------------------------------
+Ending Cell 23-----------------------------------------
+Executing Cell 24--------------------------------------
+pets_mlp: not selected; skipping.
+
+Ending Cell 24-----------------------------------------
+Executing Cell 25--------------------------------------
+Ending Cell 25-----------------------------------------
+Executing Cell 26--------------------------------------
+dlinear: not selected; skipping.
+
+Ending Cell 26-----------------------------------------
+Executing Cell 27--------------------------------------
+Ending Cell 27-----------------------------------------
+Executing Cell 28--------------------------------------
+nhits: not selected; skipping.
+
+Ending Cell 28-----------------------------------------
+Executing Cell 29--------------------------------------
+Ending Cell 29-----------------------------------------
+Executing:  58%|█████▊    | 29/50 [1:07:26<1:02:16, 177.93s/cell]Executing Cell 30--------------------------------------
+tft: not selected; skipping.
+
+Ending Cell 30-----------------------------------------
+Executing Cell 31--------------------------------------
+Ending Cell 31-----------------------------------------
+Executing Cell 32--------------------------------------
+dnlssm: not selected; skipping.
+
+Ending Cell 32-----------------------------------------
+Executing Cell 33--------------------------------------
+Ending Cell 33-----------------------------------------
+Executing Cell 34--------------------------------------
+Ending Cell 34-----------------------------------------
+Executing Cell 35--------------------------------------
+ridge: not selected; skipping.
+
+Ending Cell 35-----------------------------------------
+Executing Cell 36--------------------------------------
+Ending Cell 36-----------------------------------------
+Executing:  72%|███████▏  | 36/50 [1:07:26<25:27, 109.09s/cell]  Executing Cell 37--------------------------------------
+random_forest: not selected; skipping.
+
+Ending Cell 37-----------------------------------------
+Executing Cell 38--------------------------------------
+Ending Cell 38-----------------------------------------
+Executing Cell 39--------------------------------------
+xgboost: not selected; skipping.
+
+Ending Cell 39-----------------------------------------
+Executing Cell 40--------------------------------------
+Ending Cell 40-----------------------------------------
+Executing Cell 41--------------------------------------
+hrp_xgb: not selected; skipping.
+
+Ending Cell 41-----------------------------------------
+Executing Cell 42--------------------------------------
+Ending Cell 42-----------------------------------------
+Executing Cell 43--------------------------------------
+lightgbm: not selected; skipping.
+
+Ending Cell 43-----------------------------------------
+Executing:  86%|████████▌ | 43/50 [1:07:26<08:11, 70.26s/cell] Executing Cell 44--------------------------------------
+Ending Cell 44-----------------------------------------
+Executing Cell 45--------------------------------------
+gpr: not selected; skipping.
+
+Ending Cell 45-----------------------------------------
+Executing Cell 46--------------------------------------
+Ending Cell 46-----------------------------------------
+Executing Cell 47--------------------------------------
+Ending Cell 47-----------------------------------------
+Executing Cell 48--------------------------------------
+grey_box: not selected; skipping.
+
+Ending Cell 48-----------------------------------------
+Executing Cell 49--------------------------------------
+Ending Cell 49-----------------------------------------
+Executing Cell 50--------------------------------------
+Saved model/metadata pairs: 1
+Explicit evaluation run ID: 5S_BT128_SD44_ROUT1_20261109T221542509767Z
+Manifest: run_manifest_wm_12targets_proxy_5S_BT128_SD44_ROUT1_20261109T221542509767Z.json
+Run evaluation.ipynb for the model comparison, graphs, and comparison CSV exports.
+K16 remains reserved.
+Temporary classical feature cache cleanup requested.
+
+Ending Cell 50-----------------------------------------
+Executing: 100%|██████████| 50/50 [1:07:29<00:00, 80.99s/cell]

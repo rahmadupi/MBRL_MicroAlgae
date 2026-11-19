@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(cd /home/rahmadbisma/Documents/ITS/MBRL_MicroAlgae/dev/world_model && cp training.ipynb /tmp/training.ipynb.bak && timeout 200 python3 - <<'PYEOF' import json p='training.ipynb' nb=json.load(open(p)) # 1) replace stale K16 prints cell=nb['cells'][7] src=''.join(cell['source']) old=\"print('K16 is not loaded for fitting or selection.')\" new=\"print('Fitting cultivations:', CONFIG['split']['train'], '| selection cultivation:', CONFIG['split']['validation'])\" assert old in src cell['source']=src.replace(old,new).splitlines(keepends=True) cell=nb['cells'][49] src=''.join(cell['source']) old=\"print('K16 remains reserved.')\" new=\"print('Split used:', CONFIG['split'])\" assert old in src cell['source']=src.replace(old,new).splitlines(keepends=True) # 2) clear stale outputs on cells whose printed text now describes superseded settings for idx in (4,7,21,49): c=nb['cells'][idx] if c.get('outputs') or c.get('execution_count') is not None: c['outputs']=[]; c['execution_count']=None print(f'cell {idx}: outputs cleared') json.dump(nb, open(p,'w'), indent=1, ensure_ascii=False) open(p,'a').write('\\n') print('saved') PYEOF)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
