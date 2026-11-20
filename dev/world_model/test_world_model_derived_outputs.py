@@ -536,5 +536,54 @@ class ActionNoveltyTests(unittest.TestCase):
         self.assertEqual(len(reference['mean']), len(wm.ACTIONS))
 
 
+class McDropoutDeterminismTests(unittest.TestCase):
+    """MC dropout must be reproducible per seed without losing its stochastic spread."""
+
+    def setUp(self):
+        if wm.torch is None:
+            self.skipTest('PyTorch unavailable')
+        torch = wm.torch
+        torch.manual_seed(0)
+        architecture = {'algorithm': 'moup_mlp', 'history_minutes': 60, 'history_steps': 24,
+                        'sampling_interval_seconds': 60, 'hidden_size': 8, 'dilations': [],
+                        'head_dropout': 0.0, 'head_layout': 'shared', 'attention_heads': 2,
+                        'latent_size': 4, 'moving_average_kernel': 5, 'pool_scales': [1, 4],
+                        'sensor_channels': len(wm.FEATURES) - len(wm.ACTIONS),
+                        'action_channels': len(wm.ACTIONS), 'mc_dropout': .1,
+                        'mc_passes': 6, 'mc_seed': 44, 'uncertainty_mode': 'mc_dropout',
+                        'head_groups': {'shared': list(range(len(wm.CONTROL_TARGETS)))},
+                        'latest_sensor_to_head': False, 'latest_sensor_names': [],
+                        'latest_sensor_indices': [], 'input_channels': len(wm.FEATURES),
+                        'outputs': len(wm.CONTROL_TARGETS),
+                        'target_order': list(wm.CONTROL_TARGETS), 'log_variance_bounds': [-8, 2]}
+        self.model = wm.DynamicsNetwork(architecture).eval()
+        self.prepared = {'sequence': torch.randn(30, 24, len(wm.FEATURES)).numpy(),
+                         'extra': torch.zeros(30, len(wm.ACTIONS) + 3).numpy()}
+
+    def passes(self, seed):
+        return wm.neural_components([self.model], self.prepared, 'cpu', 16,
+                                    mc_passes=6, mc_seed=seed)[0]
+
+    def test_same_seed_reproduces_exactly(self):
+        np.testing.assert_array_equal(self.passes(44), self.passes(44))
+
+    def test_passes_within_a_call_still_differ(self):
+        """Reseeding must not collapse the dropout spread the estimator relies on."""
+        components = self.passes(44)
+        self.assertFalse(np.array_equal(components[0], components[1]))
+        self.assertGreater(float(components.std(axis=0).mean()), 0.0)
+
+    def test_different_seeds_give_different_draws(self):
+        self.assertFalse(np.array_equal(self.passes(44), self.passes(45)))
+
+    def test_rng_state_is_restored_after_seeded_prediction(self):
+        torch = wm.torch
+        torch.manual_seed(123)
+        before = torch.get_rng_state().clone()
+        self.passes(44)
+        after = torch.get_rng_state()
+        self.assertTrue(torch.equal(before, after))
+
+
 if __name__ == '__main__':
     unittest.main()

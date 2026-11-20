@@ -746,6 +746,13 @@ def make_architecture(algorithm, config):
             'hidden_size': settings['hidden_size'], 'dilations': settings.get('dilations', []),
             'head_dropout': settings.get('head_dropout', 0.),
             'mc_dropout': mc_dropout,
+            # Recorded so reloaded inference repeats the training-time forward passes.
+            # mc_passes sets how many stochastic passes each member contributes and
+            # mc_seed makes those draws reproducible; both must survive the artifact round
+            # trip, or the saved metrics cannot be reproduced from the checkpoint.
+            'mc_passes': settings.get('mc_passes'),
+            'mc_seed': (int(settings.get('mc_seed', config['seed']))
+                        if settings.get('mc_passes') else None),
             'uncertainty_mode': resolved_uncertainty_mode(algorithm, settings.get('members', 1)),
             'head_layout': head_layout, 'head_groups': head_groups,
             'attention_heads': settings.get('attention_heads', 4),
@@ -783,38 +790,57 @@ def mc_dropout_enabled(model):
     return float(getattr(model, 'mc_dropout', 0.) or 0.) > 0.
 
 
-def neural_components(models, prepared, device='cpu', batch_size=256, mc_passes=None):
+def neural_components(models, prepared, device='cpu', batch_size=256, mc_passes=None, mc_seed=None):
     """Per-member mean/variance prediction.
 
     With `mc_passes` each member contributes that many stochastic forward passes, so the
     returned component axis is (members * mc_passes) and the downstream Gaussian mixture
     represents Var[dropout] + mean predicted variance (MOUP Eq. 13). Passing None keeps
-    dropout disabled, which is what per-epoch monitoring uses so the score stays
-    deterministic and cheap.
+    dropout disabled, which is per-epoch monitoring and keeps the selection score cheap.
+
+    When `mc_seed` is supplied each pass reseeds, so a repeated call reproduces exactly the
+    same draws while passes within one call remain independent. That keeps the dropout
+    variance meaningful and makes the artifact reloadable under a determinism check; the
+    surrounding RNG state is restored afterwards so training reproducibility is unaffected.
     """
     means, variances = [], []
-    for model in models:
-        stochastic = mc_dropout_enabled(model) and mc_passes
-        passes = int(mc_passes) if stochastic else 1
-        for _ in range(passes):
-            model.eval()
-            if stochastic:
-                # Dropout active; everything else stays in eval mode.
-                for module in model.modules():
-                    if isinstance(module, torch.nn.Dropout):
-                        module.train()
-            output_mean, output_variance = [], []
-            with torch.no_grad():
-                for start in range(0, len(prepared['sequence']), batch_size):
-                    s = torch.as_tensor(prepared['sequence'][start:start + batch_size], device=device)
-                    e = torch.as_tensor(prepared['extra'][start:start + batch_size], device=device)
-                    mean, log_variance = model(s, e)
-                    output_mean.append(mean.cpu().numpy())
-                    output_variance.append(log_variance.exp().cpu().numpy())
-            means.append(np.concatenate(output_mean))
-            variances.append(np.concatenate(output_variance))
-        if mc_dropout_enabled(model):
-            model.eval()  # leave the stochastic mode so callers do not inherit it
+    restore_states, seeds = [], []
+    if mc_seed is not None and torch is not None:
+        restore_states.append(torch.get_rng_state())
+        if torch.cuda.is_available():
+            restore_states.append(torch.cuda.get_rng_state_all())
+    try:
+        for member, model in enumerate(models):
+            stochastic = mc_dropout_enabled(model) and mc_passes
+            passes = int(mc_passes) if stochastic else 1
+            for pass_index in range(passes):
+                model.eval()
+                if stochastic:
+                    # Dropout active; everything else stays in eval mode.
+                    for module in model.modules():
+                        if isinstance(module, torch.nn.Dropout):
+                            module.train()
+                    if mc_seed is not None:
+                        # Distinct per member and per pass, but reproducible across calls.
+                        seeds.append(int(mc_seed) + member * passes + pass_index)
+                        torch.manual_seed(seeds[-1])
+                output_mean, output_variance = [], []
+                with torch.no_grad():
+                    for start in range(0, len(prepared['sequence']), batch_size):
+                        s = torch.as_tensor(prepared['sequence'][start:start + batch_size], device=device)
+                        e = torch.as_tensor(prepared['extra'][start:start + batch_size], device=device)
+                        mean, log_variance = model(s, e)
+                        output_mean.append(mean.cpu().numpy())
+                        output_variance.append(log_variance.exp().cpu().numpy())
+                means.append(np.concatenate(output_mean))
+                variances.append(np.concatenate(output_variance))
+            if mc_dropout_enabled(model):
+                model.eval()  # leave the stochastic mode so callers do not inherit it
+    finally:
+        if restore_states:
+            torch.set_rng_state(restore_states[0])
+            if len(restore_states) > 1:
+                torch.cuda.set_rng_state_all(restore_states[1])
     return np.stack(means), np.stack(variances)
 
 
@@ -1132,7 +1158,8 @@ def predict(fitted, prepared):
     if fitted['kind'] == 'neural':
         means, variances = neural_components(fitted['models'], prepared, fitted['device'],
                                             fitted.get('inference_batch_size', 256),
-                                            mc_passes=fitted.get('mc_passes'))
+                                            mc_passes=fitted.get('mc_passes'),
+                                            mc_seed=fitted.get('mc_seed'))
         delta = means.mean(axis=0)
         distribution = {'component_means': means, 'component_variances': variances}
         mode = fitted.get('uncertainty_mode')
@@ -1262,6 +1289,7 @@ def save_model(fitted, output_dir, config, preprocessing, sources, index, valida
                                       'reference_rows': int(len(fitted['action_reference']['reference']))}),
         'uncertainty_label': uncertainty_label(fitted.get('uncertainty_mode')),
         'mc_passes': fitted.get('mc_passes'),
+        'mc_seed': fitted.get('mc_seed'),
         'headline_targets': headline_target_names(preprocessing),
         'macro_NRMSE_headline': validation_metrics.attrs.get('macro_NRMSE_headline'),
         'macro_NRMSE_all': validation_metrics.attrs.get('macro_NRMSE_all'),
@@ -1350,8 +1378,10 @@ def load_model(metadata_path, device='cpu'):
             )
         if not compatible_legacy:
             raise ValueError('Inference implementation differs from the saved artifact contract.')
+    payload_architecture = {}
     if metadata['category'] == 'neural':
         payload = torch.load(artifact, map_location='cpu', weights_only=True)
+        payload_architecture = payload.get('architecture', {}) or {}
         if payload['architecture'].get('outputs', len(TARGETS)) != len(expected_targets):
             raise ValueError('Checkpoint output width differs from saved target schema.')
         if payload['architecture'].get('input_channels', len(FEATURES)) != len(metadata['input_order']):
@@ -1377,19 +1407,26 @@ def load_model(metadata_path, device='cpu'):
     else:
         fitted = OPTIONAL['joblib'].load(artifact)
         fitted['device'] = 'cpu'
+        payload_architecture = {}
     if fitted['preprocessing'] != metadata['preprocessing']:
         raise ValueError('Preprocessing differs between artifact and metadata.')
     fitted['sampling_interval_seconds'] = metadata.get('sampling_interval_seconds', 60)
     fitted['observation_operator'] = metadata.get('observation_operator', 'interval_mean')
     fitted['inference_batch_size'] = metadata['config'].get('validation_batch_size', 128)
     if fitted.get('kind') == 'neural':
-        architecture = (metadata['config'].get('neural', {})
-                        .get(metadata['algorithm'], {}))
+        # The checkpoint's architecture is authoritative: it records what the network was
+        # actually built with, including the MC-dropout seed. The saved user config omits
+        # inference-only fields, so reading it here silently dropped mc_seed.
+        architecture = payload_architecture or {}
+        if not architecture:
+            architecture = (metadata['config'].get('neural', {})
+                            .get(metadata['algorithm'], {}))
         fitted['uncertainty_mode'] = architecture.get('uncertainty_mode')
         if fitted['uncertainty_mode'] is None:
             fitted['uncertainty_mode'] = resolved_uncertainty_mode(
                 metadata['algorithm'], architecture.get('members', 1))
         fitted['mc_passes'] = architecture.get('mc_passes')
+        fitted['mc_seed'] = architecture.get('mc_seed')
     return fitted, metadata
 
 
@@ -1755,11 +1792,12 @@ def load_resume_checkpoint(metadata_path, algorithm, config, preprocessing):
                          'log_variance_bounds', 'head_layout', 'latest_sensor_to_head',
                          'latest_sensor_names', 'latest_sensor_indices', 'head_groups',
                          'attention_heads', 'latent_size', 'moving_average_kernel', 'pool_scales',
-                         'sensor_channels', 'action_channels', 'mc_dropout', 'uncertainty_mode')
+                         'sensor_channels', 'action_channels', 'mc_dropout', 'uncertainty_mode',
+                         'mc_seed')
     legacy_architecture_defaults = {'head_layout': 'shared', 'latest_sensor_to_head': False,
                                     'latest_sensor_names': [], 'latest_sensor_indices': [],
                                     'attention_heads': 4, 'latent_size': 16, 'moving_average_kernel': 25,
-                                    'mc_dropout': 0., 'uncertainty_mode': None,
+                                    'mc_dropout': 0., 'uncertainty_mode': None, 'mc_seed': None,
                                     'pool_scales': [1, 4, 16],
                                     'sensor_channels': expected_architecture['sensor_channels'],
                                     'action_channels': expected_architecture['action_channels']}
@@ -2344,6 +2382,7 @@ def train_neural(algorithm, index, validation, preprocessing, config, device,
                                   'k': int(settings.get('action_novelty_k', 5))}
                                  if settings.get('action_novelty', True) else None),
             'mc_passes': settings.get('mc_passes'),
+            'mc_seed': architecture.get('mc_seed'),
             'selected_checkpoints': checkpoints, 'selected_hyperparameters': settings,
             'training_rollout': rollout_report,
             'peak_cuda_allocated_gib': (max(prior_peak_cuda, torch.cuda.max_memory_allocated(device) / 1024 ** 3)
@@ -2448,6 +2487,9 @@ def _train_classical(algorithm, train, validation, preprocessing, config):
     elif algorithm == 'random_forest':
         target_trees = settings['n_estimators']
         parameters = {key: value for key, value in settings.items() if key != 'n_estimators'}
+        # n_jobs>1 aggregates tree outputs in a nondeterministic order, so two predict()
+        # calls on the same forest differ at ~1e-16. Fitting stays parallel; n_jobs is
+        # reset to 1 before saving so stored forecasts are bit-reproducible.
         estimator = RandomForestRegressor(n_estimators=1, warm_start=True, random_state=config['seed'],
                                          n_jobs=config['cpu_threads'], **parameters)
         built = 0
@@ -2458,6 +2500,7 @@ def _train_classical(algorithm, train, validation, preprocessing, config):
                 estimator.fit(train['flat'], train['y'])
                 bar.update(next_count - built)
                 built = next_count
+        estimator.set_params(n_jobs=1)
     elif algorithm == 'xgboost':
         base = OPTIONAL['xgboost'].XGBRegressor(random_state=config['seed'], n_jobs=config['cpu_threads'],
                                                 tree_method='hist', **settings)
